@@ -1,13 +1,23 @@
 #!/bin/bash
-# Usage: bash autoopt/view_log.sh autoopt-results/logs/<file>.log
-# Or:   tail -f autoopt-results/logs/<file>.log | bash autoopt/view_log.sh
+# Usage: bash autoopt/view_log.sh [-v] <file.log>
+# Or:   tail -f <file.log> | bash autoopt/view_log.sh [-v]
 #
 # Converts stream-json output into readable text.
+# Default: agent messages only. -v: include tool calls and results.
 
 set -euo pipefail
 
-filter() {
-  jq -r --unbuffered '
+VERBOSE=false
+FILE=""
+for arg in "$@"; do
+  case "$arg" in
+    -v) VERBOSE=true ;;
+    *)  FILE="$arg" ;;
+  esac
+done
+
+if $VERBOSE; then
+  FILTER='
     if .type == "system" and .subtype == "init" then
       "═══ Session \(.session_id[:8]) | model: \(.model) ═══\n"
 
@@ -19,7 +29,7 @@ filter() {
           "→ \(.name)(\(.input | to_entries | map("\(.key)=\(.value | tostring | if length > 100 then .[:100] + "..." else . end)") | join(", ")))"
         else empty
         end
-      ] | join("\n")
+      ] | join("\n") | if . == "" then empty else "\n───\n\(.)" end
 
     elif .type == "user" then
       [.message.content[] |
@@ -39,10 +49,28 @@ filter() {
     else empty
     end
   '
-}
-
-if [ $# -ge 1 ]; then
-  cat "$1" | filter
 else
-  filter
+  FILTER='
+    if .type == "system" and .subtype == "init" then
+      "═══ Session \(.session_id[:8]) | model: \(.model) ═══"
+
+    elif .type == "assistant" then
+      [.message.content[] |
+        if .type == "text" then .text
+        else empty
+        end
+      ] | join("\n") | if . == "" then empty else "\n───\n\(.)" end
+
+    elif .type == "result" then
+      "\n═══ \(.subtype) | \(.duration_ms/1000)s | $\(.total_cost_usd | tostring[:6]) | \(.num_turns) turns ═══"
+
+    else empty
+    end
+  '
+fi
+
+if [ -n "$FILE" ]; then
+  cat "$FILE" | jq -r --unbuffered "$FILTER"
+else
+  jq -r --unbuffered "$FILTER"
 fi
