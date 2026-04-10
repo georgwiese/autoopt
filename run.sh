@@ -22,7 +22,7 @@ run_step() {
   local prompt_file="$1" step_name="$2" iteration="$3" log_name="$4"
   local log_file="autoopt-results/logs/${log_name}.log"
 
-  local cmd=(claude -p "$(cat "$prompt_file")" --dangerously-skip-permissions --effort "$EFFORT" --name "autoopt #$iteration: $step_name" --output-format stream-json)
+  local cmd=(claude -p "$(cat "$prompt_file")" --dangerously-skip-permissions --effort "$EFFORT" --name "autoopt #$iteration: $step_name" --output-format stream-json --verbose)
   [[ -n "$MODEL" ]] && cmd+=(--model "$MODEL")
   [[ -n "$FALLBACK_MODEL" ]] && cmd+=(--fallback-model "$FALLBACK_MODEL")
 
