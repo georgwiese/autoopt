@@ -28,6 +28,10 @@ If log.md or reports don't exist yet, this is the first iteration.
 
 # Steps
 
+## Step 0: Setup (if needed)
+
+On the very first run, you *might* have to follow the setup instructions in `autoopt/context.md`. Checker whether it has been completed and if not, complete it now.
+
 ## Step 1: Baseline
 
 Check if `autoopt-results/baseline/` exists and contains result files.

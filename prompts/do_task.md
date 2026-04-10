@@ -76,6 +76,8 @@ A comparison table with metrics. Show:
 | Metric | Baseline | Before Task | After Task | vs Baseline | vs Before |
 |--------|----------|-------------|------------|-------------|-----------|
 
+In the "vs" columns, show the absolute diff and the factor of change, e.g. "1.34x higher" or "1.04x lower".
+
 Use the metrics and analysis tools from `autoopt/context.md`.
 
 ### Assessment
@@ -119,6 +121,11 @@ Commit normally. You're done.
 2. Run `git revert <commit>` to undo the changes on the branch
    - For multiple commits: `git revert --no-commit <oldest>^..<newest> && git commit -m "Revert <task_name>: optimization did not improve performance"`
 3. This keeps the branch clean while making the work recoverable via `git log`
+
+
+## Step 7: Create tag
+
+On your last commit, create a tag with `autoopt/<task_name>`.
 
 ---
 
