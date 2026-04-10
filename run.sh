@@ -22,13 +22,13 @@ run_step() {
   local prompt_file="$1" step_name="$2" iteration="$3" log_name="$4"
   local log_file="autoopt-results/logs/${log_name}.log"
 
-  local cmd=(claude -p "$(cat "$prompt_file")" --dangerously-skip-permissions --effort "$EFFORT" --name "autoopt #$iteration: $step_name")
+  local cmd=(claude -p "$(cat "$prompt_file")" --dangerously-skip-permissions --effort "$EFFORT" --name "autoopt #$iteration: $step_name" --output-format stream-json)
   [[ -n "$MODEL" ]] && cmd+=(--model "$MODEL")
   [[ -n "$FALLBACK_MODEL" ]] && cmd+=(--fallback-model "$FALLBACK_MODEL")
 
   while true; do
-    echo "[$(date)] $step_name"
-    if "${cmd[@]}" 2>&1 | tee "$log_file"; then
+    echo "[$(date)] $step_name → $log_file"
+    if "${cmd[@]}" > "$log_file" 2>&1; then
       break
     fi
     echo "[$(date)] $step_name failed (exit $?), retrying in ${RETRY_DELAY}s..."
