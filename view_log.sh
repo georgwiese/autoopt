@@ -38,7 +38,7 @@ filter() {
 
     else empty
     end
-  ' 2>/dev/null
+  '
 }
 
 if [ $# -ge 1 ]; then
