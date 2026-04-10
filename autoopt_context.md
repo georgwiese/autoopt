@@ -77,6 +77,7 @@ This allows tracking both cumulative progress and incremental impact.
   1. Commit the implementation anyway (preserving it in git history).
   2. Immediately `git revert` the commit(s).
   3. This keeps the branch clean while making the work recoverable.
+- After the final commit for each task (whether successful or a revert), create a tag: `autoopt/<task_name>`.
 
 ### Baseline
 

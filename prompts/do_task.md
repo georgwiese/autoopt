@@ -142,3 +142,4 @@ Go through this checklist. Do NOT end your session until every box is checked:
 - [ ] Implementation is committed to git with descriptive message(s)
 - [ ] autoopt-results/ is NOT committed or staged
 - [ ] If optimization failed: committed then reverted
+- [ ] Created tag `autoopt/<task_name>` on the last commit

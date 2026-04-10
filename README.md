@@ -45,7 +45,7 @@ That's it. The agent will create `autoopt-results/` in your project directory an
 
 ## How It Works
 
-Each iteration runs three separate Claude sessions back-to-back:
+Each iteration runs three separate Claude sessions in a loop:
 
 ### Phase 1: Generate Task
 
