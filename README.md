@@ -91,12 +91,33 @@ autoopt-results/
 
 ### Logging
 
-All output is logged to `autoopt-results/logs/`:
+All output is logged to `autoopt-results/logs/`. The terminal shows progress:
+
+```
+========================================
+[Fri Apr 10 19:20:08 CEST 2026] Iteration 1 / 100
+========================================
+[Fri Apr 10 19:20:08 CEST 2026] Generate Task → autoopt-results/logs/20260410-192008-1-1-generate.log
+```
+
+Each step's full output is saved as stream-json:
 
 - `run.log` — the bash script's own output (all iterations)
-- `<timestamp>-<iteration>-1-generate.log` — claude output for each Generate Task run
-- `<timestamp>-<iteration>-2-plan.log` — claude output for each Create Plan run
-- `<timestamp>-<iteration>-3-do.log` — claude output for each Execute Task run
+- `<timestamp>-<iteration>-1-generate.log` — Generate Task session
+- `<timestamp>-<iteration>-2-plan.log` — Create Plan session
+- `<timestamp>-<iteration>-3-do.log` — Execute Task session
+
+To watch a running session in readable form:
+
+```bash
+tail -f autoopt-results/logs/20260410-192008-1-1-generate.log | bash autoopt/view_log.sh
+```
+
+Or read a completed session:
+
+```bash
+bash autoopt/view_log.sh autoopt-results/logs/20260410-192008-1-1-generate.log
+```
 
 Each session is also named (e.g., "autoopt #3: Generate Task") so they appear in `claude --resume`.
 
@@ -111,6 +132,7 @@ If any phase fails (e.g., API credit exhaustion, network error), the script retr
 | File | Description |
 |------|-------------|
 | `run.sh` | Bash loop that drives the three phases |
+| `view_log.sh` | Converts stream-json logs to readable text |
 | `autoopt_context.md` | Generic framework documentation read by all agents |
 | `context_template.md` | Template for project-specific context |
 | `review_guideline_template.md` | Template for plan review guidelines |
