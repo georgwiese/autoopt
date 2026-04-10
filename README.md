@@ -2,7 +2,7 @@
 
 Automated optimization loop powered by Claude. Symlink this into any project, write a context file describing what to optimize and how to measure it, and let agents iterate: analyze, plan, implement, measure, repeat.
 
-Inspired by [autoresearch](https://github.com/karpathy/autoresearch) and [Anthropic's C compiler approach](https://www.anthropic.com/engineering/building-c-compiler).
+Inspired by [autoresearch](https://github.com/karpathy/autoresearch) and [Anthropic's C compiler experiment](https://www.anthropic.com/engineering/building-c-compiler).
 
 ## Quickstart
 
@@ -111,21 +111,3 @@ If any phase fails (e.g., API credit exhaustion, network error), the script retr
 | `autoopt-results/<task>/plan.md` | Approved plan |
 | `autoopt-results/<task>/report.md` | Results report |
 | `autoopt-results/<task>/results/` | Measurement artifacts |
-
-## Writing a Good context.md
-
-The quality of `context.md` determines how well the agents perform. Key principles:
-
-- **Be exact about measurement commands.** Don't say "run the benchmark." Say `python bench.py --config fast --output results.json`. The agent needs copy-pasteable commands.
-- **Define success numerically.** "Faster" is vague. "Reduce latency from 50ms to 30ms" gives the agent a clear target.
-- **List constraints explicitly.** If the API contract can't change, say so. If certain files are off-limits, name them.
-- **Describe what result files look like.** The agent needs to know what to save and how to compare before vs. after.
-- **Include prior knowledge.** If you know where the bottleneck is, say so. Link to relevant docs, papers, or profiles.
-
-## Tips
-
-- Check `autoopt-results/log.md` periodically to see cumulative progress.
-- Individual task reports in `autoopt-results/<task>/report.md` have detailed analysis.
-- All implementation work is in git history, including reverted failed attempts — use `git log` to review.
-- To resume after stopping: just run `bash autoopt/run.sh` again. The agent reads the log and picks up where it left off.
-- To steer the agent: edit `autoopt-results/log.md` to add notes about what to try or avoid next, or edit `autoopt-results/task.md` to override the next task.

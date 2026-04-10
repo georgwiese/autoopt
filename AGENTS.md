@@ -1,6 +1,7 @@
 # Agent Guide for AutoOpt
 
 This file provides context for AI agents working in this codebase.
+Read the [README.md](README.md).
 
 ## What This Repo Is
 
