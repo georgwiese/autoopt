@@ -29,7 +29,7 @@ if $VERBOSE; then
           "→ \(.name)(\(.input | to_entries | map("\(.key)=\(.value | tostring | if length > 100 then .[:100] + "..." else . end)") | join(", ")))"
         else empty
         end
-      ] | join("\n") | if . == "" then empty else "\n───\n\(.)" end
+      ] | join("\n") | if . == "" then empty else "───\n\(.)" end
 
     elif .type == "user" then
       [.message.content[] |
@@ -59,7 +59,7 @@ else
         if .type == "text" then .text
         else empty
         end
-      ] | join("\n") | if . == "" then empty else "\n───\n\(.)" end
+      ] | join("\n") | if . == "" then empty else "───\n\(.)" end
 
     elif .type == "result" then
       "\n═══ \(.subtype) | \(.duration_ms/1000)s | $\(.total_cost_usd | tostring[:6]) | \(.num_turns) turns ═══"
