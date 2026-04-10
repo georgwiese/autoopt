@@ -24,7 +24,6 @@ Read ALL of the following files before doing anything else:
 2. `autoopt/context.md` — project-specific context (measurement commands, profiling tools, constraints)
 3. `autoopt-results/task.md` — the current task description (contains the task name)
 4. Extract the task name, then read `autoopt-results/<task_name>/plan.md` — the approved implementation plan
-5. `autoopt-results/log.md` — if it exists, to know the previous task's results
 
 # Steps
 

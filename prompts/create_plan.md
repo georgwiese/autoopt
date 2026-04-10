@@ -68,10 +68,7 @@ Under what conditions should we give up and revert. Be specific (e.g., "less tha
 
 ## Step 4: Review Loop
 
-Read `autoopt/review_guideline.md` to understand the review standard.
-
-Then launch a **subagent** to review the plan. The subagent starts with NO context, so you MUST include the FULL CONTENT of these files in the subagent's prompt:
-
+Then launch a **subagent** to review the plan. The subagent should be instructed to read:
 - `autoopt/review_guideline.md` (the review standard to follow)
 - `autoopt/context.md` (project context)
 - `autoopt-results/task.md` (the task being planned)
