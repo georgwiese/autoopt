@@ -34,6 +34,11 @@ $EDITOR context.md
 cd /path/to/your-project
 bash autoopt/run.sh        # default: 100 iterations
 bash autoopt/run.sh 10     # or specify a count
+
+# Optional: configure model and effort
+EFFORT=high bash autoopt/run.sh
+MODEL=sonnet bash autoopt/run.sh
+FALLBACK_MODEL=sonnet bash autoopt/run.sh   # fallback when primary is overloaded
 ```
 
 That's it. The agent will create `autoopt-results/` in your project directory and start optimizing.
@@ -42,6 +47,14 @@ That's it. The agent will create `autoopt-results/` in your project directory an
 
 - [Claude Code CLI](https://docs.anthropic.com/en/docs/claude-code) installed and authenticated
 - The `claude` command must be available in PATH
+
+## Configuration
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `EFFORT` | `max` | Claude effort level (`low`, `medium`, `high`, `max`) |
+| `MODEL` | *(default)* | Model to use (e.g., `sonnet`, `opus`) |
+| `FALLBACK_MODEL` | *(none)* | Fallback model when primary is overloaded |
 
 ## How It Works
 
@@ -75,6 +88,17 @@ autoopt-results/
     report.md            # Written by phase 3
     results/             # Measurement artifacts from phase 3
 ```
+
+### Logging
+
+All output is logged to `autoopt-results/logs/`:
+
+- `run.log` — the bash script's own output (all iterations)
+- `<timestamp>-<iteration>-1-generate.log` — claude output for each Generate Task run
+- `<timestamp>-<iteration>-2-plan.log` — claude output for each Create Plan run
+- `<timestamp>-<iteration>-3-do.log` — claude output for each Execute Task run
+
+Each session is also named (e.g., "autoopt #3: Generate Task") so they appear in `claude --resume`.
 
 ### Error Handling
 
@@ -111,3 +135,4 @@ If any phase fails (e.g., API credit exhaustion, network error), the script retr
 | `autoopt-results/<task>/plan.md` | Approved plan |
 | `autoopt-results/<task>/report.md` | Results report |
 | `autoopt-results/<task>/results/` | Measurement artifacts |
+| `autoopt-results/logs/` | Script and claude session logs |
