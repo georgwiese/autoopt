@@ -81,28 +81,12 @@ Consider what has already been tried (from log.md and reports). Do NOT repeat fa
 
 Rank ideas by (expected impact x probability of success / complexity). Select the top one.
 
-Write `autoopt-results/task.md`. This file is a SHORT summary — the detailed analysis goes in plan.md. Keep task.md under 40 lines. Use EXACTLY this structure:
+Write `autoopt-results/task.md` with this structure:
 
 ```
-# Task: <TASK_NAME>
+# <task name>
 
-Task name: <YYYY-MM-DD-HHMM-descriptive-name>
-
-## Problem Statement
-
-<1-2 sentences. What bottleneck, with key numbers from profiling.>
-
-## Proposed Approach
-
-<1-2 sentences. What changes and why it helps.>
-
-## Expected Outcome
-
-<1-2 sentences. Expected improvement with numbers.>
-
-## Success Criteria
-
-<The metric, the threshold, and the rollback condition.>
+<1-3 sentences describing the optimization idea and why it is expected to help.>
 ```
 
 Use the current date and time for the task name. Example: `2026-04-10-1430-parallelize-kernel-launches`
