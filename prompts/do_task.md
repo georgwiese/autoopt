@@ -37,6 +37,8 @@ Follow the measurement instructions in `autoopt/context.md`.
 
 This is your "before" snapshot. You need it for the report.
 
+**If the before-measurements fail or produce empty results, STOP.** Write a report explaining the failure (what command failed, what error occurred, whether it appears to be a pre-existing issue). Append a log entry noting the measurement infrastructure is broken. Then end your session. Do not proceed to implementation — without before-measurements, you cannot evaluate whether the optimization helped.
+
 ## Step 2: Implement
 
 Follow the plan step by step. After each significant change:
@@ -55,6 +57,8 @@ Keep iterating until EITHER:
 
 Run the full measurement suite again.
 Save result files as `autoopt-results/<task_name>/results/after_*`.
+
+**If a measurement command produces empty or invalid output, or fails with the same error twice in a row, do NOT retry the same command again.** Diagnose why it failed. If the failure is not caused by your changes (e.g., pre-existing OOM, infrastructure issue), proceed to Step 4 and write the report noting the measurement failure. An unmeasured optimization with passing tests is an acceptable outcome. An infinite retry loop is not.
 
 Compare against:
 - **Baseline**: `autoopt-results/baseline/`

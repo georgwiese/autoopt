@@ -48,6 +48,8 @@ If it already exists, skip this step.
 
 Run the measurement commands described in `autoopt/context.md` to capture the system's current state. This may differ from baseline if previous optimizations were applied.
 
+**If any measurement command fails or produces empty results, STOP.** Do not proceed to profiling or task generation. Instead, write `autoopt-results/task.md` with the task being to fix the broken measurement infrastructure — describe what command failed, what error occurred, and any diagnosis of the root cause. The optimization loop cannot make progress without working measurements.
+
 ## Step 3: Profile
 
 Run the profiling tools described in `autoopt/context.md`. Identify where time is being spent. Focus on the metric(s) described in the problem description.
