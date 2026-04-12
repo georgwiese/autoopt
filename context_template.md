@@ -24,7 +24,9 @@
 - Exact commands to run
 - How to interpret the output
 - What files are produced
-- Any scripts for analysis -->
+- Any scripts for analysis
+- Prerequisites (e.g., GPU must be free — check with nvidia-smi)
+- Approximate duration per measurement run -->
 
 ## Profiling
 
