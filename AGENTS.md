@@ -27,15 +27,15 @@ The prompts in `prompts/` are the most sensitive files in this repo. When editin
 
 ## Key Design Decisions
 
-1. **Three separate sessions, not one long session.** Prevents context window degradation. Each phase starts fresh and focused. The cost is that context must be re-read from files, but this is deliberate — it forces clear documentation.
+1. **Two separate sessions, not one long session.** Analysis/planning and execution run as separate sessions. This prevents context window degradation during implementation (which generates the most output). The cost is that context must be re-read from files, but this is deliberate — it forces clear documentation.
 
-2. **File-based communication.** `autoopt-results/task.md` is the contract between phase 1 and phases 2/3. `plan.md` is the contract between phase 2 and phase 3. If you change the expected format of these files, update all prompts that read them.
+2. **File-based communication.** `autoopt-results/task.md` and `autoopt-results/<task_name>/plan.md` are the contracts between the planning phase and the execution phase. If you change the expected format of these files, update all prompts that read them.
 
 3. **Baseline + previous comparison.** Results are always relative to two points: the original baseline and the immediately previous task. This matters because it shows both cumulative progress and whether each individual task helped.
 
 4. **Commit then revert on failure.** Failed optimizations are committed before being reverted. This preserves the work in git history so it can be recovered or learned from, while keeping the branch clean for the next iteration.
 
-5. **Review loop in phase 2.** The planning phase spawns a sub-agent to review the plan. The sub-agent gets all context inlined in its prompt (it has no access to the filesystem). The review iterates until the reviewer reports no design-level blockers.
+5. **Review loop in the planning phase.** The planning phase spawns a sub-agent to review the plan. The sub-agent gets all context inlined in its prompt (it has no access to the filesystem). The review iterates until the reviewer reports no design-level blockers.
 
 ## Testing Changes
 
@@ -51,5 +51,5 @@ There are no automated tests. To verify changes to the framework:
 
 - **Don't add project-specific content to `autoopt_context.md` or the prompts.** These are shared across all projects. Project-specific details go in `context.md`.
 - **Don't assume the agent will read files it wasn't told to read.** If a prompt needs information from a file, it must explicitly say "Read file X".
-- **Don't merge prompt phases.** The three-phase split is load-bearing. Combining them into fewer sessions leads to context window exhaustion and instruction drift.
+- **Don't merge the planning and execution phases.** The two-phase split is load-bearing. The execution phase generates too much output (builds, test runs, benchmarks) to share a session with analysis and planning.
 - **`autoopt-results/` lives in the target project, not here.** This repo is the framework. Results are created in whatever project the user symlinks this into.

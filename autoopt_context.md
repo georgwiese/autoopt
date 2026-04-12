@@ -4,11 +4,10 @@ AutoOpt is an automated optimization harness. It uses AI agents to iteratively i
 
 ## How It Works
 
-Each iteration has three phases, each run as a separate agent session:
+Each iteration has two phases, each run as a separate agent session:
 
-1. **Generate Task** — Analyze current performance, review optimization history, and select the most promising optimization to attempt next.
-2. **Create Plan** — Design a detailed implementation plan and have it reviewed by a sub-agent until it meets quality standards.
-3. **Execute Task** — Implement the optimization, measure results, document findings, and commit changes.
+1. **Generate & Plan** — Analyze current performance, review optimization history, select the most promising optimization, and produce a reviewed implementation plan.
+2. **Execute Task** — Implement the optimization, measure results, document findings, and commit changes.
 
 The phases communicate through files in `autoopt-results/`. Each phase reads the outputs of previous phases and writes its own outputs.
 

@@ -73,7 +73,13 @@ for i in $(seq 1 "$MAX_ITERATIONS"); do
   echo "========================================"
   echo "[$(date)] Iteration $i / $MAX_ITERATIONS"
   echo "========================================"
-  run_step "$SCRIPT_DIR/prompts/generate_task.md" "Generate Task" "$i" "${TIMESTAMP}-${i}-1-generate"
-  run_step "$SCRIPT_DIR/prompts/create_plan.md"   "Create Plan"   "$i" "${TIMESTAMP}-${i}-2-plan"
-  run_step "$SCRIPT_DIR/prompts/do_task.md"        "Do Task"       "$i" "${TIMESTAMP}-${i}-3-do"
+  run_step "$SCRIPT_DIR/prompts/generate_plan.md" "Generate & Plan" "$i" "${TIMESTAMP}-${i}-1-plan"
+
+  if [[ -f autoopt-results/task.md ]]; then
+    echo "----------------------------------------"
+    cat autoopt-results/task.md
+    echo "----------------------------------------"
+  fi
+
+  run_step "$SCRIPT_DIR/prompts/do_task.md"        "Do Task"        "$i" "${TIMESTAMP}-${i}-2-do"
 done

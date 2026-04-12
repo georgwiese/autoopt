@@ -58,54 +58,55 @@ That's it. The agent will create `autoopt-results/` in your project directory an
 
 ## How It Works
 
-Each iteration runs three separate Claude sessions in a loop:
+Each iteration runs two separate Claude sessions:
 
-### Phase 1: Generate Task
+### Phase 1: Generate & Plan
 
-The agent reads all context and history, measures current performance, profiles the system, and generates several optimization ideas. It picks the most promising one based on expected impact, probability of success, and implementation complexity, then writes a task description to `autoopt-results/task.md`.
+The agent reads all context and history, measures current performance, profiles the system, and generates several optimization ideas. It picks the most promising one, writes a task summary to `autoopt-results/task.md`, then designs a detailed implementation plan. The plan is reviewed by a sub-agent against the review guideline and iterated until approved.
 
 On the first run, it also creates `autoopt-results/baseline/` with baseline measurements that all future results are compared against.
 
-### Phase 2: Create Plan
-
-The agent reads the task, researches the relevant code paths, and writes a detailed implementation plan. It then spawns a reviewer sub-agent that evaluates the plan against the review guideline. The plan is iterated until the reviewer approves it (no design-level blockers, prototype-ready).
-
-### Phase 3: Execute Task
+### Phase 2: Execute Task
 
 The agent measures before, implements the plan, and measures after. It writes a detailed report with results compared to both the baseline and the previous task, appends a summary to the log, and commits the implementation. If the optimization didn't help, it commits anyway (preserving the work in git history) then reverts.
 
 ### Communication Between Phases
 
-The three phases are independent Claude sessions with no shared context. They communicate entirely through files in `autoopt-results/`:
+The two phases are independent Claude sessions with no shared context. They communicate entirely through files in `autoopt-results/`:
 
 ```
 autoopt-results/
   baseline/              # Baseline measurements (created once)
-  task.md                # Current task (written by phase 1, read by 2 and 3)
-  log.md                 # Append-only history (read by phase 1, appended by phase 3)
+  task.md                # Current task summary (written by phase 1, read by phase 2)
+  log.md                 # Append-only history (read by phase 1, appended by phase 2)
   2026-04-10-1430-foo/
-    plan.md              # Written by phase 2, read by phase 3
-    report.md            # Written by phase 3
-    results/             # Measurement artifacts from phase 3
+    plan.md              # Written by phase 1, read by phase 2
+    report.md            # Written by phase 2
+    results/             # Measurement artifacts from phase 2
 ```
 
 ### Logging
 
-All output is logged to `autoopt-results/logs/`. The terminal shows progress:
+All output is logged to `autoopt-results/logs/`. The terminal shows progress, including the task summary between phases:
 
 ```
 ========================================
 [Fri Apr 10 19:20:08 CEST 2026] Iteration 1 / 100
 ========================================
-[Fri Apr 10 19:20:08 CEST 2026] Generate Task → autoopt-results/logs/20260410-192008-1-1-generate.log
+[Fri Apr 10 19:20:08 CEST 2026] Generate & Plan → autoopt-results/logs/20260410-192008-1-1-plan.log
+----------------------------------------
+# Task: Defer Round 0 D2H Synchronization
+Task name: 2026-04-10-1933-defer-round0-d2h-sync
+...
+----------------------------------------
+[Fri Apr 10 19:49:58 CEST 2026] Do Task → autoopt-results/logs/20260410-192008-1-2-do.log
 ```
 
 Each step's full output is saved as stream-json:
 
 - `run.log` — the bash script's own output (all iterations)
-- `<timestamp>-<iteration>-1-generate.log` — Generate Task session
-- `<timestamp>-<iteration>-2-plan.log` — Create Plan session
-- `<timestamp>-<iteration>-3-do.log` — Execute Task session
+- `<timestamp>-<iteration>-1-plan.log` — Generate & Plan session
+- `<timestamp>-<iteration>-2-do.log` — Execute Task session
 
 To watch a running session in readable form:
 
@@ -123,7 +124,7 @@ Each session is also named (e.g., "autoopt #3: Generate Task") so they appear in
 
 ### Error Handling
 
-If any phase fails (e.g., API credit exhaustion, network error), the script retries after 60 seconds until it succeeds.
+If a phase hits a rate limit, the script extracts the reset timestamp from the output, sleeps until credits are available, and resumes the same session (preserving all context). For other failures, it retries after 60 seconds with a fresh session.
 
 ## File Reference
 
@@ -131,14 +132,13 @@ If any phase fails (e.g., API credit exhaustion, network error), the script retr
 
 | File | Description |
 |------|-------------|
-| `run.sh` | Bash loop that drives the three phases |
+| `run.sh` | Bash loop that drives the two phases |
 | `view_log.sh` | Converts stream-json logs to readable text |
 | `autoopt_context.md` | Generic framework documentation read by all agents |
 | `context_template.md` | Template for project-specific context |
 | `review_guideline_template.md` | Template for plan review guidelines |
-| `prompts/generate_task.md` | Prompt for phase 1 |
-| `prompts/create_plan.md` | Prompt for phase 2 |
-| `prompts/do_task.md` | Prompt for phase 3 |
+| `prompts/generate_plan.md` | Prompt for phase 1 (Generate & Plan) |
+| `prompts/do_task.md` | Prompt for phase 2 (Execute Task) |
 
 ### Created per project (gitignored)
 
