@@ -16,7 +16,10 @@ for arg in "$@"; do
   esac
 done
 
-TS='(if .timestamp then "[" + (.timestamp | split("T")[1] | split(".")[0]) + "] " else "" end)'
+TS='(.timestamp // "" | if . != "" then split("T")[1] | split(".")[0] else "" end)'
+
+# Post-processor: tracks last timestamp from @TS@ markers, injects into ─── lines
+MERGE_TS='{ if (/^@TS@/) { ts = substr($0, 5); next } if (/^───$/ && ts != "") { print "─── " ts; ts = "" } else { print } }'
 
 if $VERBOSE; then
   FILTER='
@@ -34,17 +37,17 @@ if $VERBOSE; then
       ] | join("\n") | if . == "" then empty else "───\n\(.)" end
 
     elif .type == "user" then
-      '"$TS"' as $ts |
+      ('"$TS"') as $ts |
       [.message.content[] |
         if .type == "tool_result" then
           if (.content | length) > 500 then
-            "\($ts)← \(.content[:500])..."
+            "  ← \(.content[:500])..."
           else
-            "\($ts)← \(.content)"
+            "  ← \(.content)"
           end
         else empty
         end
-      ] | join("\n")
+      ] | join("\n") | if $ts != "" then "@TS@\($ts)\n\(.)" else . end
 
     elif .type == "result" then
       "\n═══ \(.subtype) | \(.duration_ms/1000)s | $\(.total_cost_usd | tostring[:6]) | \(.num_turns) turns ═══"
@@ -65,7 +68,7 @@ else
       ] | join("\n") | if . == "" then empty else "───\n\(.)" end
 
     elif .type == "user" and .timestamp then
-      "[\(.timestamp | split("T")[1] | split(".")[0])]"
+      "@TS@\(.timestamp | split("T")[1] | split(".")[0])"
 
     elif .type == "result" then
       "\n═══ \(.subtype) | \(.duration_ms/1000)s | $\(.total_cost_usd | tostring[:6]) | \(.num_turns) turns ═══"
@@ -76,7 +79,7 @@ else
 fi
 
 if [ -n "$FILE" ]; then
-  cat "$FILE" | jq -r --unbuffered "$FILTER"
+  cat "$FILE" | jq -r --unbuffered "$FILTER" | awk "$MERGE_TS"
 else
-  jq -r --unbuffered "$FILTER"
+  jq -r --unbuffered "$FILTER" | awk "$MERGE_TS"
 fi
