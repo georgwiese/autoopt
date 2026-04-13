@@ -16,6 +16,8 @@ for arg in "$@"; do
   esac
 done
 
+TS='(if .timestamp then "[" + (.timestamp | split("T")[1] | split(".")[0]) + "] " else "" end)'
+
 if $VERBOSE; then
   FILTER='
     if .type == "system" and .subtype == "init" then
@@ -32,12 +34,13 @@ if $VERBOSE; then
       ] | join("\n") | if . == "" then empty else "───\n\(.)" end
 
     elif .type == "user" then
+      '"$TS"' as $ts |
       [.message.content[] |
         if .type == "tool_result" then
           if (.content | length) > 500 then
-            "  ← \(.content[:500])..."
+            "\($ts)← \(.content[:500])..."
           else
-            "  ← \(.content)"
+            "\($ts)← \(.content)"
           end
         else empty
         end
@@ -60,6 +63,9 @@ else
         else empty
         end
       ] | join("\n") | if . == "" then empty else "───\n\(.)" end
+
+    elif .type == "user" and .timestamp then
+      "[\(.timestamp | split("T")[1] | split(".")[0])]"
 
     elif .type == "result" then
       "\n═══ \(.subtype) | \(.duration_ms/1000)s | $\(.total_cost_usd | tostring[:6]) | \(.num_turns) turns ═══"
